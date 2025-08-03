@@ -34,7 +34,7 @@ test_tokens = set()
 train_dataset = []
 valid_dataset = []
 test_dataset = []
-max_other_token_count = 55_000  # 55k
+max_other_token_count = 5_000  # 55k
 other_token_count_for_each_lang = {
     'de': 0,
     'en': 0,
