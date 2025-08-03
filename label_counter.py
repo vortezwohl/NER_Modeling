@@ -1,5 +1,4 @@
 import json
-from data_process import processed_labels
 
 with open('./data/datasets.json', 'r', encoding='utf-8') as f:
     datasets = json.load(f)
@@ -11,7 +10,7 @@ test_dataset = datasets['test']
 
 def count_labels(s: str) -> list:
     labels = []
-    for label in processed_labels:
+    for label in range(5):
         labels.append((label, s.count(str(label) + ']')))
     return labels
 
