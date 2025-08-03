@@ -112,7 +112,7 @@ for tokens, labels, lang in tqdm(total_train_data):
         if token in train_tokens:
             continue
         train_tokens.add(token)
-        if labels[i] > 0 and labels[i] in processed_labels:
+        if labels[i] > 0:
             train_dataset.append((token, labels[i]))
         else:
             if other_token_count_for_each_lang[lang] < max_other_token_count:
@@ -126,7 +126,7 @@ for tokens, labels, lang in tqdm(total_valid_data):
         if token in valid_tokens:
             continue
         valid_tokens.add(token)
-        if labels[i] > 0 and labels[i] in processed_labels:
+        if labels[i] > 0:
             valid_dataset.append((token, labels[i]))
         else:
             if other_token_count_for_each_lang[lang] < max_other_token_count:
@@ -140,7 +140,7 @@ for tokens, labels, lang in tqdm(total_test_data):
         if token in test_tokens:
             continue
         test_tokens.add(token)
-        if labels[i] > 0 and labels[i] in processed_labels:
+        if labels[i] > 0:
             test_dataset.append((token, labels[i]))
         else:
             if other_token_count_for_each_lang[lang] < max_other_token_count:
