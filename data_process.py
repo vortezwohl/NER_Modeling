@@ -1,6 +1,7 @@
 import os
 import json
 
+from tqdm import tqdm
 import pandas as pd
 
 base_path = './data/multilingual_wikineural'
@@ -47,11 +48,11 @@ other_token_count_for_each_lang = {
     'ru': 0
 }
 label_map = {
-    0: 0,
-    1: 1,
-    3: 2,
-    5: 3,
-    7: 4,
+    0: 0,  # other
+    1: 1,  # person
+    3: 2,  # org
+    5: 3,  # loc
+    7: 4,  # misc
 }
 
 
@@ -72,23 +73,39 @@ def token_combination(T: list, L: list) -> tuple[list, list]:
     abandon_id = []
     for _i, _token in enumerate(T):
         if L[_i] > 0 and L[_i] % 2 == 0:
-            T[_i - 1] = T[_i - 1] + ' ' + _token
-            abandon_id.append(_i)
+            if L[_i - 1] % 2 == 1:
+                T[_i - 1] = T[_i - 1] + ' ' + _token
+                abandon_id.append(_i)
     ret_T = []
     ret_L = []
     for _i, _token in enumerate(T):
         if _i not in abandon_id:
             ret_T.append(_token)
-            ret_L.append(label_map[L[_i]])
+            ret_L.append(L[_i])
     return ret_T, ret_L
 
 
-for tokens, labels, lang in total_train_data:
+def label_mapping(L: list) -> list:
+    return [label_map[_] for _ in L]
+
+
+def recursive_token_combination(T: list, L: list) -> tuple[list, list]:
+    while True:
+        T, L = token_combination(T, L)
+        _continue = False
+        for _l in L:
+            if _l > 0 and _l % 2 == 0:
+                _continue = True
+        if _continue:
+            continue
+        return T, label_mapping(L)
+
+
+for tokens, labels, lang in tqdm(total_train_data):
     tokens, labels = token_decode(tokens), label_decode(labels)
-    tokens, labels = token_combination(tokens, labels)
+    tokens, labels = recursive_token_combination(tokens, labels)
     for i, token in enumerate(tokens):
         if token in train_tokens:
-            print(token, end=' ')
             continue
         train_tokens.add(token)
         if labels[i] > 0:
@@ -98,12 +115,11 @@ for tokens, labels, lang in total_train_data:
                 other_token_count_for_each_lang[lang] += 1
                 train_dataset.append((token, labels[i]))
 
-for tokens, labels, lang in total_valid_data:
+for tokens, labels, lang in tqdm(total_valid_data):
     tokens, labels = token_decode(tokens), label_decode(labels)
-    tokens, labels = token_combination(tokens, labels)
+    tokens, labels = recursive_token_combination(tokens, labels)
     for i, token in enumerate(tokens):
         if token in valid_tokens:
-            print(token, end=' ')
             continue
         valid_tokens.add(token)
         if labels[i] > 0:
@@ -113,12 +129,11 @@ for tokens, labels, lang in total_valid_data:
                 other_token_count_for_each_lang[lang] += 1
                 valid_dataset.append((token, labels[i]))
 
-for tokens, labels, lang in total_test_data:
+for tokens, labels, lang in tqdm(total_test_data):
     tokens, labels = token_decode(tokens), label_decode(labels)
-    tokens, labels = token_combination(tokens, labels)
+    tokens, labels = recursive_token_combination(tokens, labels)
     for i, token in enumerate(tokens):
         if token in test_tokens:
-            print(token, end=' ')
             continue
         test_tokens.add(token)
         if labels[i] > 0:
