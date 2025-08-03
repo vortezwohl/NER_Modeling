@@ -35,7 +35,7 @@ test_tokens = set()
 train_dataset = []
 valid_dataset = []
 test_dataset = []
-max_other_token_count = 7_000
+max_other_token_count = 11_000
 other_token_count_for_each_lang = {
     'de': 0,
     'en': 0,
@@ -73,7 +73,7 @@ def token_combination(T: list, L: list) -> tuple[list, list]:
     abandon_id = []
     for _i, _token in enumerate(T):
         if L[_i] > 0 and L[_i] % 2 == 0:
-            if L[_i - 1] % 2 == 1:
+            if L[_i - 1] % 2 == 1 or L[_i - 1] == 0:
                 T[_i - 1] = T[_i - 1] + ' ' + _token
                 abandon_id.append(_i)
     ret_T = []
@@ -90,7 +90,10 @@ def label_mapping(L: list) -> list:
 
 
 def recursive_token_combination(T: list, L: list) -> tuple[list, list]:
-    while True:
+    max_iter = 100
+    _iter = 0
+    while _iter < max_iter:
+        _iter += 1
         T, L = token_combination(T, L)
         _continue = False
         for _l in L:
