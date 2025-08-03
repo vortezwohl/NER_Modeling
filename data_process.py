@@ -34,7 +34,7 @@ test_tokens = set()
 train_dataset = []
 valid_dataset = []
 test_dataset = []
-max_other_token_count = 5_000  # 55k
+max_other_token_count = 7_000
 other_token_count_for_each_lang = {
     'de': 0,
     'en': 0,
@@ -45,6 +45,13 @@ other_token_count_for_each_lang = {
     'pl': 0,
     'pt': 0,
     'ru': 0
+}
+label_map = {
+    0: 0,
+    1: 1,
+    3: 2,
+    5: 3,
+    7: 4,
 }
 
 
@@ -61,8 +68,24 @@ def label_decode(s: str) -> list:
     return _labels
 
 
+def token_combination(T: list, L: list) -> tuple[list, list]:
+    abandon_id = []
+    for _i, _token in enumerate(T):
+        if L[_i] > 0 and L[_i] % 2 == 0:
+            T[_i - 1] = T[_i - 1] + ' ' + _token
+            abandon_id.append(_i)
+    ret_T = []
+    ret_L = []
+    for _i, _token in enumerate(T):
+        if _i not in abandon_id:
+            ret_T.append(_token)
+            ret_L.append(label_map[L[_i]])
+    return ret_T, ret_L
+
+
 for tokens, labels, lang in total_train_data:
     tokens, labels = token_decode(tokens), label_decode(labels)
+    tokens, labels = token_combination(tokens, labels)
     for i, token in enumerate(tokens):
         if token in train_tokens:
             print(token, end=' ')
@@ -77,6 +100,7 @@ for tokens, labels, lang in total_train_data:
 
 for tokens, labels, lang in total_valid_data:
     tokens, labels = token_decode(tokens), label_decode(labels)
+    tokens, labels = token_combination(tokens, labels)
     for i, token in enumerate(tokens):
         if token in valid_tokens:
             print(token, end=' ')
@@ -91,6 +115,7 @@ for tokens, labels, lang in total_valid_data:
 
 for tokens, labels, lang in total_test_data:
     tokens, labels = token_decode(tokens), label_decode(labels)
+    tokens, labels = token_combination(tokens, labels)
     for i, token in enumerate(tokens):
         if token in test_tokens:
             print(token, end=' ')
