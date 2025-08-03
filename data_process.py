@@ -126,12 +126,7 @@ for tokens, labels, lang in tqdm(total_valid_data):
         if token in valid_tokens:
             continue
         valid_tokens.add(token)
-        if labels[i] > 0:
-            valid_dataset.append((token, labels[i]))
-        else:
-            if other_token_count_for_each_lang[lang] < max_other_token_count:
-                other_token_count_for_each_lang[lang] += 1
-                valid_dataset.append((token, labels[i]))
+        valid_dataset.append((token, labels[i]))
 
 for tokens, labels, lang in tqdm(total_test_data):
     tokens, labels = token_decode(tokens), label_decode(labels)
@@ -140,12 +135,7 @@ for tokens, labels, lang in tqdm(total_test_data):
         if token in test_tokens:
             continue
         test_tokens.add(token)
-        if labels[i] > 0:
-            test_dataset.append((token, labels[i]))
-        else:
-            if other_token_count_for_each_lang[lang] < max_other_token_count:
-                other_token_count_for_each_lang[lang] += 1
-                test_dataset.append((token, labels[i]))
+        test_dataset.append((token, labels[i]))
 
 with open('./data/datasets.json', 'w', encoding='utf-8') as f:
     json.dump({
