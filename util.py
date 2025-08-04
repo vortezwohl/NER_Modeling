@@ -1,6 +1,6 @@
 import torch
 
-NUM_CLASSES = 5
+NUM_CLASSES = 4
 
 
 def one_hot(num: int) -> torch.Tensor:
