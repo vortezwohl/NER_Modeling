@@ -65,6 +65,8 @@ try:
     for epoch in range(num_epochs):
         model.train()
         for i, (_token, _label) in enumerate(train_dataset):
+            if _label == 4:
+                continue
             _one_hot_label = one_hot(_label).to(model.dtype).to(model.device)
             outputs = model.forward(encode(_token))
             loss = loss_function(outputs, _one_hot_label) + model.elastic_net(alpha=elastic_net_param['alpha'],
@@ -86,6 +88,8 @@ try:
                 rand_idx = randint(0, len(valid_dataset) - 501)
                 with torch.no_grad():
                     for _i, (__token, __label) in enumerate(valid_dataset[rand_idx: rand_idx + 500]):
+                        if __label == 4:
+                            continue
                         _one_hot_label = one_hot(__label).to(model.dtype).to(model.device)
                         outputs = model.forward(encode(__token))
                         loss = loss_function(outputs, _one_hot_label)
