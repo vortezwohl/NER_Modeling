@@ -35,8 +35,42 @@ test_tokens = set()
 train_dataset = []
 valid_dataset = []
 test_dataset = []
-max_other_token_count = 11_000
+max_other_token_count = 4_800
+max_train_token_for_each_class_count = 4_800
 other_token_count_for_each_lang = {
+    'de': 0,
+    'en': 0,
+    'es': 0,
+    'fr': 0,
+    'it': 0,
+    'nl': 0,
+    'pl': 0,
+    'pt': 0,
+    'ru': 0
+}
+person_token_count_for_each_lang = {
+    'de': 0,
+    'en': 0,
+    'es': 0,
+    'fr': 0,
+    'it': 0,
+    'nl': 0,
+    'pl': 0,
+    'pt': 0,
+    'ru': 0
+}
+org_token_count_for_each_lang = {
+    'de': 0,
+    'en': 0,
+    'es': 0,
+    'fr': 0,
+    'it': 0,
+    'nl': 0,
+    'pl': 0,
+    'pt': 0,
+    'ru': 0
+}
+loc_token_count_for_each_lang = {
     'de': 0,
     'en': 0,
     'es': 0,
@@ -112,12 +146,23 @@ for tokens, labels, lang in tqdm(total_train_data):
         if token in train_tokens:
             continue
         train_tokens.add(token)
-        if labels[i] > 0:
-            train_dataset.append((token, labels[i]))
-        else:
-            if other_token_count_for_each_lang[lang] < max_other_token_count:
-                other_token_count_for_each_lang[lang] += 1
-                train_dataset.append((token, labels[i]))
+        match labels[i]:
+            case 1:
+                if person_token_count_for_each_lang[lang] < max_train_token_for_each_class_count:
+                    person_token_count_for_each_lang[lang] += 1
+                    train_dataset.append((token, labels[i]))
+            case 2:
+                if org_token_count_for_each_lang[lang] < max_train_token_for_each_class_count:
+                    org_token_count_for_each_lang[lang] += 1
+                    train_dataset.append((token, labels[i]))
+            case 3:
+                if loc_token_count_for_each_lang[lang] < max_train_token_for_each_class_count:
+                    loc_token_count_for_each_lang[lang] += 1
+                    train_dataset.append((token, labels[i]))
+            case 0:
+                if other_token_count_for_each_lang[lang] < max_other_token_count:
+                    other_token_count_for_each_lang[lang] += 1
+                    train_dataset.append((token, labels[i]))
 
 for tokens, labels, lang in tqdm(total_valid_data):
     tokens, labels = token_decode(tokens), label_decode(labels)
