@@ -1,5 +1,6 @@
 import os
 import json
+from random import shuffle
 
 from tqdm import tqdm
 import pandas as pd
@@ -28,6 +29,10 @@ for lang, data in test_data.items():
     for d in data:
         total_test_data.append((d['tokens'], d['ner_tags'], d['lang']))
 
+shuffle(total_train_data)
+shuffle(total_valid_data)
+shuffle(total_test_data)
+
 train_tokens = set()
 valid_tokens = set()
 test_tokens = set()
@@ -35,8 +40,8 @@ test_tokens = set()
 train_dataset = []
 valid_dataset = []
 test_dataset = []
-max_other_token_count = 4_800
-max_train_token_for_each_class_count = 4_800
+max_other_token_count = 4_450
+max_train_token_for_each_class_count = 4_450
 other_token_count_for_each_lang = {
     'de': 0,
     'en': 0,
@@ -152,9 +157,11 @@ for tokens, labels, lang in tqdm(total_train_data):
                     person_token_count_for_each_lang[lang] += 1
                     train_dataset.append((token, labels[i]))
             case 2:
-                if org_token_count_for_each_lang[lang] < max_train_token_for_each_class_count:
-                    org_token_count_for_each_lang[lang] += 1
-                    train_dataset.append((token, labels[i]))
+                # if org_token_count_for_each_lang[lang] < max_train_token_for_each_class_count:
+                #     org_token_count_for_each_lang[lang] += 1
+                #     train_dataset.append((token, labels[i]))
+                org_token_count_for_each_lang[lang] += 1
+                train_dataset.append((token, labels[i]))
             case 3:
                 if loc_token_count_for_each_lang[lang] < max_train_token_for_each_class_count:
                     loc_token_count_for_each_lang[lang] += 1
